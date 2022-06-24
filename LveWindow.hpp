@@ -33,6 +33,10 @@ namespace lve {
       framebufferResized = false;
     }
 
+    GLFWwindow *getGLFWwindow() const {
+      return window;
+    }
+
     void createWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 
   private:

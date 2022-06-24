@@ -1,4 +1,5 @@
 #include "FirstApp.hpp"
+#include "KeyboardMovementController.hpp"
 #include "LveCamera.hpp"
 #include "SimpleRenderSystem.hpp"
 
@@ -7,6 +8,7 @@
 #include <glm/glm.hpp>
 
 #include <array>
+#include <chrono>
 
 namespace lve {
 
@@ -22,12 +24,31 @@ namespace lve {
         lveDevice, lveRenderer.getSwapChainRenderPass()
     };
     LveCamera camera{};
-    camera.setViewDirection(glm::vec3{0.f}, glm::vec3{.5f, 0.f, 1.f});
+    camera.setViewTarget(glm::vec3{-1.f, -2.f, -2.f}, glm::vec3{0.f, 0.f, 2.5f});
+
+    auto viewerObject = LveGameObject::createGameObject();
+    KeyboardMovementController cameraController{};
+
+    auto currentTime = std::chrono::high_resolution_clock::now();
 
     while (!lveWindow.shouldClose()) {
+      glfwPollEvents();
+
+      auto newTime = std::chrono::high_resolution_clock::now();
+      float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(
+          newTime - currentTime
+      ).count();
+      currentTime = newTime;
+
+      cameraController.moveInPlaneXZ(
+          lveWindow.getGLFWwindow(), frameTime, viewerObject
+      );
+      camera.setViewYXZ(
+          viewerObject.transform.translation, viewerObject.transform.rotation
+      );
+
       float aspect = lveRenderer.getAspectRatio();
       camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
-      glfwPollEvents();
 
       if (auto commandBuffer = lveRenderer.beginFrame()) {
         lveRenderer.beginSwapChainRenderPass(commandBuffer);
