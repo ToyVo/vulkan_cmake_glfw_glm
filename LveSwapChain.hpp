@@ -2,6 +2,7 @@
 #define LVE_LVESWAPCHAIN_HPP
 
 #include "LveDevice.hpp"
+#include <memory>
 #include <string>
 #include <vector>
 #include <vulkan/vulkan.h>
@@ -14,11 +15,15 @@ namespace lve {
 
     LveSwapChain(LveDevice &deviceRef, VkExtent2D windowExtent);
 
+    LveSwapChain(
+        LveDevice &deviceRef, VkExtent2D windowExtent, std::shared_ptr<LveSwapChain> previous
+    );
+
     ~LveSwapChain();
 
     LveSwapChain(const LveSwapChain &) = delete;
 
-    void operator=(const LveSwapChain &) = delete;
+    LveSwapChain &operator=(const LveSwapChain &) = delete;
 
     VkFramebuffer getFrameBuffer(int index) {
       return swapChainFramebuffers[index];
@@ -65,6 +70,8 @@ namespace lve {
     );
 
   private:
+    void init();
+
     void createSwapChain();
 
     void createImageViews();
@@ -104,6 +111,7 @@ namespace lve {
     VkExtent2D windowExtent;
 
     VkSwapchainKHR swapChain;
+    std::shared_ptr<LveSwapChain> oldSwapChain;
 
     std::vector<VkSemaphore> imageAvailableSemaphores;
     std::vector<VkSemaphore> renderFinishedSemaphores;
