@@ -4,6 +4,7 @@
 #include "LveCamera.hpp"
 
 #include <vulkan/vulkan.h>
+#include "LveGameObject.hpp"
 
 namespace lve {
   struct FrameInfo {
@@ -12,6 +13,7 @@ namespace lve {
     VkCommandBuffer commandBuffer;
     LveCamera &camera;
     VkDescriptorSet globalDescriptorSet;
+    LveGameObject::Map &gameObjects;
   };
 }// namespace lve
 

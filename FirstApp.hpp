@@ -11,27 +11,30 @@
 
 namespace lve {
 
-    class FirstApp {
-    public:
-        static constexpr int WIDTH = 800;
-        static constexpr int HEIGHT = 600;
+  class FirstApp {
+  public:
+    static constexpr int WIDTH = 800;
+    static constexpr int HEIGHT = 600;
 
-        FirstApp();
-        ~FirstApp();
-        FirstApp(const FirstApp &) = delete;
-        FirstApp &operator=(const FirstApp &) = delete;
+    FirstApp();
 
-        void run();
+    ~FirstApp();
 
-    private:
-        void loadGameObjects();
+    FirstApp(const FirstApp &) = delete;
 
-        LveWindow lveWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
-        LveDevice lveDevice{lveWindow};
-      LveRenderer lveRenderer{lveWindow, lveDevice};
-      std::unique_ptr<LveDescriptorPool> globalPool{};
-      std::vector<LveGameObject> gameObjects;
-    };
+    FirstApp &operator=(const FirstApp &) = delete;
+
+    void run();
+
+  private:
+    void loadGameObjects();
+
+    LveWindow lveWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
+    LveDevice lveDevice{lveWindow};
+    LveRenderer lveRenderer{lveWindow, lveDevice};
+    std::unique_ptr<LveDescriptorPool> globalPool{};
+    LveGameObject::Map gameObjects;
+  };
 
 }// namespace lve
 
