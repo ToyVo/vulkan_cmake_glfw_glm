@@ -26,9 +26,8 @@ namespace lve {
   }
 
   void FirstApp::loadModels() {
-    std::vector<LveModel::Vertex> vertices{{{0.0f,  -0.5f}},
-                                           {{0.5f,  0.5f}},
-                                           {{-0.5f, 0.5f}}};
+    std::vector<LveModel::Vertex> vertices{};
+    siserpinski(vertices, 5, {-0.5f, 0.5f}, {0.5f, 0.5f}, {0.0f, -0.5f});
     lveModel = std::make_unique<LveModel>(lveDevice, vertices);
   }
 
@@ -119,6 +118,23 @@ namespace lve {
     );
     if (result != VK_SUCCESS) {
       throw std::runtime_error("failed to present swap chain image");
+    }
+  }
+
+  void FirstApp::siserpinski(
+      std::vector<LveModel::Vertex> &vertices, int depth, glm::vec2 left, glm::vec2 right, glm::vec2 top
+  ) {
+    if (depth <= 0) {
+      vertices.push_back({top});
+      vertices.push_back({right});
+      vertices.push_back({left});
+    } else {
+      auto leftTop = 0.5f * (left + top);
+      auto rightTop = 0.5f * (right + top);
+      auto leftRight = 0.5f * (left + right);
+      siserpinski(vertices, depth - 1, left, leftRight, leftTop);
+      siserpinski(vertices, depth - 1, leftRight, right, rightTop);
+      siserpinski(vertices, depth - 1, leftTop, rightTop, top);
     }
   }
 
