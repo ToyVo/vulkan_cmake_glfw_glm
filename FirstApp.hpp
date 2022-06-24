@@ -10,33 +10,26 @@
 
 namespace lve {
 
-  class FirstApp {
-  public:
-    static constexpr int WIDTH = 800;
-    static constexpr int HEIGHT = 600;
+    class FirstApp {
+    public:
+        static constexpr int WIDTH = 800;
+        static constexpr int HEIGHT = 600;
 
-    FirstApp();
+        FirstApp();
+        ~FirstApp();
+        FirstApp(const FirstApp &) = delete;
+        FirstApp &operator=(const FirstApp &) = delete;
 
-    ~FirstApp();
+        void run();
 
-    FirstApp(const FirstApp &) = delete;
+    private:
+        void loadGameObjects();
 
-    FirstApp &operator=(const FirstApp &) = delete;
-
-    void run();
-
-  private:
-    void loadGameObjects();
-
-    std::unique_ptr<LveModel> createCubeModel(
-        LveDevice &device, glm::vec3 offset
-    );
-
-    LveWindow lveWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
-    LveDevice lveDevice{lveWindow};
-    LveRenderer lveRenderer{lveWindow, lveDevice};
-    std::vector<LveGameObject> gameObjects;
-  };
+        LveWindow lveWindow{WIDTH, HEIGHT, "Hello Vulkan!"};
+        LveDevice lveDevice{lveWindow};
+        LveRenderer lveRenderer{lveWindow, lveDevice};
+        std::vector<LveGameObject> gameObjects;
+    };
 
 }// namespace lve
 
