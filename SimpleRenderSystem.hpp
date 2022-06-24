@@ -1,6 +1,7 @@
 #ifndef LVE_SIMPLERENDERSYSTEM_HPP
 #define LVE_SIMPLERENDERSYSTEM_HPP
 
+#include "LveCamera.hpp"
 #include "LveDevice.hpp"
 #include "LveGameObject.hpp"
 #include "LvePipeline.hpp"
@@ -20,7 +21,7 @@ namespace lve {
     SimpleRenderSystem &operator=(const SimpleRenderSystem &) = delete;
 
     void renderGameObjects(
-        VkCommandBuffer commandBuffer, std::vector<LveGameObject> &gameObjects
+        VkCommandBuffer commandBuffer, std::vector<LveGameObject> &gameObjects, const LveCamera &camera
     );
 
   private:
