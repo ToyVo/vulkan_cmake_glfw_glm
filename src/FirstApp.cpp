@@ -23,8 +23,9 @@ namespace lve {
 
   FirstApp::FirstApp() {
     globalPool = LveDescriptorPool::Builder(lveDevice).setMaxSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT).addPoolSize(
-        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, LveSwapChain::MAX_FRAMES_IN_FLIGHT
-    ).build();
+                                                          VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                                          LveSwapChain::MAX_FRAMES_IN_FLIGHT
+                                                      ).build();
     loadGameObjects();
   }
 
@@ -34,15 +35,15 @@ namespace lve {
   void FirstApp::run() {
 
     std::vector<std::unique_ptr<LveBuffer>> uboBuffers(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
-    for (int i = 0; i < uboBuffers.size(); i++) {
-      uboBuffers[i] = std::make_unique<LveBuffer>(
+    for (auto &uboBuffer: uboBuffers) {
+      uboBuffer = std::make_unique<LveBuffer>(
           lveDevice,
           sizeof(GlobalUbo),
           1,
           VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
           VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
       );
-      uboBuffers[i]->map();
+      uboBuffer->map();
     }
 
     auto globalSetLayout = LveDescriptorSetLayout::Builder(lveDevice).addBinding(
@@ -71,17 +72,11 @@ namespace lve {
       glfwPollEvents();
 
       auto newTime = std::chrono::high_resolution_clock::now();
-      float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(
-          newTime - currentTime
-      ).count();
+      float frameTime = std::chrono::duration<float, std::chrono::seconds::period>(newTime - currentTime).count();
       currentTime = newTime;
 
-      cameraController.moveInPlaneXZ(
-          lveWindow.getGLFWwindow(), frameTime, viewerObject
-      );
-      camera.setViewYXZ(
-          viewerObject.transform.translation, viewerObject.transform.rotation
-      );
+      cameraController.moveInPlaneXZ(lveWindow.getGLFWwindow(), frameTime, viewerObject);
+      camera.setViewYXZ(viewerObject.transform.translation, viewerObject.transform.rotation);
 
       float aspect = lveRenderer.getAspectRatio();
       camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 100.f);

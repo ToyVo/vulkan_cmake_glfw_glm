@@ -1,5 +1,5 @@
-#ifndef LVE__LVEBUFFER_HPP_
-#define LVE__LVEBUFFER_HPP_
+#ifndef LVE_LVEBUFFER_HPP
+#define LVE_LVEBUFFER_HPP
 
 #include "LveDevice.hpp"
 
@@ -90,4 +90,4 @@ namespace lve {
   };
 }// namespace lve
 
-#endif//LVE__LVEBUFFER_HPP_
+#endif//LVE_LVEBUFFER_HPP

@@ -99,32 +99,25 @@ namespace lve {
     pipelineInfo.basePipelineIndex = -1;
     pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 
-    if (vkCreateGraphicsPipelines(
-        lveDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline
-    ) != VK_SUCCESS) {
+    if (vkCreateGraphicsPipelines(lveDevice.device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &graphicsPipeline) !=
+        VK_SUCCESS) {
       throw std::runtime_error("failed to create graphics pipeline");
     }
   }
 
-  void LvePipeline::createShaderModule(
-      const std::vector<char> &code, VkShaderModule *shaderModule
-  ) {
+  void LvePipeline::createShaderModule(const std::vector<char> &code, VkShaderModule *shaderModule) {
     VkShaderModuleCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     createInfo.codeSize = code.size();
     createInfo.pCode = reinterpret_cast<const uint32_t *>(code.data());
 
-    if (vkCreateShaderModule(
-        lveDevice.device(), &createInfo, nullptr, shaderModule
-    ) != VK_SUCCESS) {
+    if (vkCreateShaderModule(lveDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
       throw std::runtime_error("failed to create shader module");
     }
   }
 
   void LvePipeline::bind(VkCommandBuffer commandBuffer) {
-    vkCmdBindPipeline(
-        commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline
-    );
+    vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
   }
 
   void LvePipeline::defaultPipelineConfigInfo(PipelineConfigInfo &configInfo) {
@@ -164,14 +157,12 @@ namespace lve {
                                                      VK_COLOR_COMPONENT_B_BIT |
                                                      VK_COLOR_COMPONENT_A_BIT;
     configInfo.colorBlendAttachment.blendEnable = VK_FALSE;
-    configInfo.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;// Optional
-    configInfo.colorBlendAttachment
-              .dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;                                  // Optional
-    configInfo.colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;// Optional
-    configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;// Optional
-    configInfo.colorBlendAttachment
-              .dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;                                  // Optional
-    configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;// Optional
+    configInfo.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
+    configInfo.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;// Optional
+    configInfo.colorBlendAttachment.colorBlendOp = VK_BLEND_OP_ADD;            // Optional
+    configInfo.colorBlendAttachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
+    configInfo.colorBlendAttachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;// Optional
+    configInfo.colorBlendAttachment.alphaBlendOp = VK_BLEND_OP_ADD;            // Optional
 
     configInfo.colorBlendInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
     configInfo.colorBlendInfo.logicOpEnable = VK_FALSE;
@@ -194,9 +185,7 @@ namespace lve {
     configInfo.depthStencilInfo.front = {};// Optional
     configInfo.depthStencilInfo.back = {}; // Optional
 
-    configInfo.dynamicStateEnables = {
-        VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR
-    };
+    configInfo.dynamicStateEnables = {VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR};
     configInfo.dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
     configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
     configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());

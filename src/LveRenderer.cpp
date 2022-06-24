@@ -30,10 +30,8 @@ namespace lve {
       std::shared_ptr<LveSwapChain> oldSwapChain = std::move(lveSwapChain);
       lveSwapChain = std::make_unique<LveSwapChain>(lveDevice, extent, oldSwapChain);
 
-      if (!oldSwapChain->compareSwapFormats(*lveSwapChain.get())) {
-        throw std::runtime_error(
-            "Swap chain image(or depth) format has changed!"
-        );
+      if (!oldSwapChain->compareSwapFormats(*lveSwapChain)) {
+        throw std::runtime_error("Swap chain image(or depth) format has changed!");
       }
     }
   }
@@ -47,8 +45,7 @@ namespace lve {
     allocateInfo.commandPool = lveDevice.getCommandPool();
     allocateInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
-    if (vkAllocateCommandBuffers(
-        lveDevice.device(), &allocateInfo, commandBuffers.data()) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(lveDevice.device(), &allocateInfo, commandBuffers.data()) != VK_SUCCESS) {
       throw std::runtime_error("failed to allocate command buffers!");
     }
   }
@@ -90,8 +87,7 @@ namespace lve {
   }
 
   void LveRenderer::endFrame() {
-    assert(isFrameStarted &&
-               "Cannot call endFrame while frame is not in progress");
+    assert(isFrameStarted && "Cannot call endFrame while frame is not in progress");
 
     auto commandBuffer = getCurrentCommandBuffer();
 
@@ -112,8 +108,7 @@ namespace lve {
   }
 
   void LveRenderer::beginSwapChainRenderPass(VkCommandBuffer commandBuffer) {
-    assert(isFrameStarted &&
-               "Cannot call beginSwapChainRenderPass while frame is not in progress");
+    assert(isFrameStarted && "Cannot call beginSwapChainRenderPass while frame is not in progress");
     assert(commandBuffer == getCurrentCommandBuffer() &&
            "Cannot begin render pass on command buffer from a different frame");
 
@@ -131,9 +126,7 @@ namespace lve {
     renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
     renderPassInfo.pClearValues = clearValues.data();
 
-    vkCmdBeginRenderPass(
-        commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE
-    );
+    vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
     VkViewport viewport{};
     viewport.x = 0.0f;
@@ -148,8 +141,7 @@ namespace lve {
   }
 
   void LveRenderer::endSwapChainRenderPass(VkCommandBuffer commandBuffer) {
-    assert(isFrameStarted &&
-               "Cannot call endSwapChainRenderPass while frame is not in progress");
+    assert(isFrameStarted && "Cannot call endSwapChainRenderPass while frame is not in progress");
     assert(commandBuffer == getCurrentCommandBuffer() &&
            "Cannot end render pass on command buffer from a different frame");
 

@@ -4,6 +4,7 @@
 #include "LveDevice.hpp"
 #include <string>
 #include <vector>
+
 namespace lve {
   struct PipelineConfigInfo {
     PipelineConfigInfo() = default;
@@ -52,9 +53,7 @@ namespace lve {
         const std::string &vertFilePath, const std::string &fragFilePath, const PipelineConfigInfo &configInfo
     );
 
-    void createShaderModule(
-        const std::vector<char> &code, VkShaderModule *shaderModule
-    );
+    void createShaderModule(const std::vector<char> &code, VkShaderModule *shaderModule);
 
     LveDevice &lveDevice;
     VkPipeline graphicsPipeline;

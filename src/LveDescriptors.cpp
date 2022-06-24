@@ -35,9 +35,8 @@ namespace lve {
     descriptorSetLayoutInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
     descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
 
-    if (vkCreateDescriptorSetLayout(
-        lveDevice.device(), &descriptorSetLayoutInfo, nullptr, &descriptorSetLayout
-    ) != VK_SUCCESS) {
+    if (vkCreateDescriptorSetLayout(lveDevice.device(), &descriptorSetLayoutInfo, nullptr, &descriptorSetLayout) !=
+        VK_SUCCESS) {
       throw std::runtime_error("failed to create descriptor set layout!");
     }
   }
@@ -46,16 +45,12 @@ namespace lve {
     vkDestroyDescriptorSetLayout(lveDevice.device(), descriptorSetLayout, nullptr);
   }
 
-  LveDescriptorPool::Builder &LveDescriptorPool::Builder::addPoolSize(
-      VkDescriptorType descriptorType, uint32_t count
-  ) {
+  LveDescriptorPool::Builder &LveDescriptorPool::Builder::addPoolSize(VkDescriptorType descriptorType, uint32_t count) {
     poolSizes.push_back({descriptorType, count});
     return *this;
   }
 
-  LveDescriptorPool::Builder &LveDescriptorPool::Builder::setPoolFlags(
-      VkDescriptorPoolCreateFlags flags
-  ) {
+  LveDescriptorPool::Builder &LveDescriptorPool::Builder::setPoolFlags(VkDescriptorPoolCreateFlags flags) {
     poolFlags = flags;
     return *this;
   }
@@ -122,9 +117,7 @@ namespace lve {
   }, pool{pool} {
   }
 
-  LveDescriptorWriter &LveDescriptorWriter::writeBuffer(
-      uint32_t binding, VkDescriptorBufferInfo *bufferInfo
-  ) {
+  LveDescriptorWriter &LveDescriptorWriter::writeBuffer(uint32_t binding, VkDescriptorBufferInfo *bufferInfo) {
     assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
     auto &bindingDescription = setLayout.bindings[binding];
@@ -142,9 +135,7 @@ namespace lve {
     return *this;
   }
 
-  LveDescriptorWriter &LveDescriptorWriter::writeImage(
-      uint32_t binding, VkDescriptorImageInfo *imageInfo
-  ) {
+  LveDescriptorWriter &LveDescriptorWriter::writeImage(uint32_t binding, VkDescriptorImageInfo *imageInfo) {
     assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
 
     auto &bindingDescription = setLayout.bindings[binding];

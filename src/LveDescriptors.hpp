@@ -1,5 +1,5 @@
-#ifndef LVE__LVEDESCRIPTORS_HPP_
-#define LVE__LVEDESCRIPTORS_HPP_
+#ifndef LVE_LVEDESCRIPTORS_HPP
+#define LVE_LVEDESCRIPTORS_HPP
 
 #include "LveDevice.hpp"
 #include <memory>
@@ -95,4 +95,4 @@ namespace lve {
   };
 }// namespace lve
 
-#endif//LVE__LVEDESCRIPTORS_HPP_
+#endif//LVE_LVEDESCRIPTORS_HPP

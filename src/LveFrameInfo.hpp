@@ -1,10 +1,10 @@
-#ifndef LVE__LVEFRAMEINFO_HPP_
-#define LVE__LVEFRAMEINFO_HPP_
+#ifndef LVE_LVEFRAMEINFO_HPP
+#define LVE_LVEFRAMEINFO_HPP
 
 #include "LveCamera.hpp"
 
-#include <vulkan/vulkan.h>
 #include "LveGameObject.hpp"
+#include <vulkan/vulkan.h>
 
 namespace lve {
   struct FrameInfo {
@@ -17,4 +17,4 @@ namespace lve {
   };
 }// namespace lve
 
-#endif//LVE__LVEFRAMEINFO_HPP_
+#endif//LVE_LVEFRAMEINFO_HPP
