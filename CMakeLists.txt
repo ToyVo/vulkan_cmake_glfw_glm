@@ -23,6 +23,6 @@ endForeach ()
 
 add_custom_target(shaders ALL DEPENDS ${SPV_SHADERS} make-shader-dir)
 
-add_executable(lve main.cpp ${SHADERS})
+add_executable(lve main.cpp ${SHADERS} LveWindow.cpp LveWindow.hpp FirstApp.cpp FirstApp.hpp)
 add_dependencies(lve shaders)
 target_link_libraries(lve glfw Vulkan::Vulkan)
