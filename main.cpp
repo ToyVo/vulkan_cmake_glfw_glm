@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include <vector>
 #include <optional>
+#include <set>
+#include <map>
 
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
@@ -57,9 +59,10 @@ public:
 private:
   struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
+    std::optional<uint32_t> presentFamily;
 
     bool isComplete() {
-      return graphicsFamily.has_value();
+      return graphicsFamily.has_value() && presentFamily.has_value();
     }
   };
 
@@ -73,6 +76,7 @@ private:
   void initVulkan() {
     createInstance();
     setupDebugMessenger();
+    createSurface();
     pickPhysicalDevice();
     createLogicalDevice();
   }
@@ -219,6 +223,12 @@ private:
     return VK_FALSE;
   }
 
+  void createSurface() {
+    if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
+      throw std::runtime_error("failed to create window surface!");
+    }
+  }
+
   void pickPhysicalDevice() {
     uint32_t deviceCount = 0;
 
@@ -231,27 +241,38 @@ private:
     std::vector<VkPhysicalDevice> devices(deviceCount);
     vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
 
+    std::multimap<int, VkPhysicalDevice> canidates;
+
     for (const auto &device: devices) {
-      if (isDeviceSuitable(device)) {
-        physicalDevice = device;
-        break;
-      }
+      int score = rateDeviceSuitability(device);
+      canidates.insert(std::make_pair(score, device));
     }
 
-    if (physicalDevice == VK_NULL_HANDLE) {
+    if (canidates.rbegin()->first > 0) {
+      physicalDevice = canidates.rbegin()->second;
+    } else {
       throw std::runtime_error("failed to find suitable GPU!");
     }
   }
 
-  bool isDeviceSuitable(VkPhysicalDevice device) {
-    QueueFamilyIndices indices = findQueueFamilies(device);
-    return indices.isComplete();
-    // Example on how to determine device suitability based on features and properties
-    //  VkPhysicalDeviceProperties deviceProperties;
-    //  VkPhysicalDeviceFeatures deviceFeatures;
-    //  vkGetPhysicalDeviceProperties(device, &deviceProperties);
-    //  vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
-    //  return deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU && deviceFeatures.geometryShader;
+  int rateDeviceSuitability(VkPhysicalDevice device) {
+    VkPhysicalDeviceProperties deviceProperties;
+    VkPhysicalDeviceFeatures deviceFeatures;
+    vkGetPhysicalDeviceProperties(device, &deviceProperties);
+    vkGetPhysicalDeviceFeatures(device, &deviceFeatures);
+
+    int score = 0;
+
+    if (deviceProperties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU) {
+      score += 1000;
+    }
+
+    score += deviceProperties.limits.maxImageDimension2D;
+
+    if (!deviceFeatures.geometryShader) {
+      return 0;
+    }
+    return score;
   }
 
   QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device) {
@@ -269,6 +290,12 @@ private:
         indices.graphicsFamily = i;
       }
 
+      VkBool32 presentSupport = false;
+      vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+      if (presentSupport) {
+        indices.presentFamily = i;
+      }
+
       if (indices.isComplete()) {
         break;
       }
@@ -282,19 +309,25 @@ private:
   void createLogicalDevice() {
     QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
-    VkDeviceQueueCreateInfo queueCreateInfo{};
-    queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
-    queueCreateInfo.queueFamilyIndex = indices.graphicsFamily.value();
-    queueCreateInfo.queueCount = 1;
+    std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
+    std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
+
     float queuePriority = 1.f;
-    queueCreateInfo.pQueuePriorities = &queuePriority;
+    for (uint32_t queueFamily: uniqueQueueFamilies) {
+      VkDeviceQueueCreateInfo queueCreateInfo{};
+      queueCreateInfo.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+      queueCreateInfo.queueFamilyIndex = queueFamily;
+      queueCreateInfo.queueCount = 1;
+      queueCreateInfo.pQueuePriorities = &queuePriority;
+      queueCreateInfos.push_back(queueCreateInfo);
+    }
 
     VkPhysicalDeviceFeatures deviceFeatures{};
 
     VkDeviceCreateInfo createInfo{};
     createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-    createInfo.pQueueCreateInfos = &queueCreateInfo;
-    createInfo.queueCreateInfoCount = 1;
+    createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
+    createInfo.pQueueCreateInfos = queueCreateInfos.data();
     createInfo.enabledExtensionCount = 0;
     if (enableValidationLayers) {
       createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -308,6 +341,7 @@ private:
     }
 
     vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
+    vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
   }
 
   void mainLoop() {
@@ -321,6 +355,7 @@ private:
     if (enableValidationLayers) {
       DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
     }
+    vkDestroySurfaceKHR(instance, surface, nullptr);
     vkDestroyInstance(instance, nullptr);
     glfwDestroyWindow(window);
     glfwTerminate();
@@ -333,6 +368,8 @@ private:
   VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
   VkDevice device;
   VkQueue graphicsQueue;
+  VkSurfaceKHR surface;
+  VkQueue presentQueue;
 };
 
 int main() {
