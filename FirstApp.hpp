@@ -2,6 +2,7 @@
 #define LVE_FIRSTAPP_HPP
 
 #include "LveDevice.hpp"
+#include "LveModel.hpp"
 #include "LvePipeline.hpp"
 #include "LveSwapChain.hpp"
 #include "LveWindow.hpp"
@@ -26,6 +27,8 @@ namespace lve {
     void run();
 
   private:
+    void loadModels();
+
     void createPipelineLayout();
 
     void createPipeline();
@@ -40,8 +43,9 @@ namespace lve {
     std::unique_ptr<LvePipeline> lvePipeline;
     VkPipelineLayout pipelineLayout;
     std::vector<VkCommandBuffer> commandBuffers;
+    std::unique_ptr<LveModel> lveModel;
   };
 
 }// namespace lve
 
-#endif//LVE_FIRSTAPP_HPP
+#endif// LVE_FIRSTAPP_HPP

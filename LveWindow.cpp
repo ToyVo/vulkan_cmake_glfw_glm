@@ -27,7 +27,9 @@ namespace lve {
     return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
   }
 
-  void LveWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR *surface) {
+  void LveWindow::createWindowSurface(
+      VkInstance instance, VkSurfaceKHR *surface
+  ) {
     if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS) {
       throw std::runtime_error("failed to create window surface");
     }

@@ -69,7 +69,9 @@ namespace lve {
       return querySwapChainSupport(physicalDevice);
     }
 
-    uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+    uint32_t findMemoryType(
+        uint32_t typeFilter, VkMemoryPropertyFlags properties
+    );
 
     QueueFamilyIndices findPhysicalQueueFamilies() {
       return findQueueFamilies(physicalDevice);
@@ -129,7 +131,9 @@ namespace lve {
 
     QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
 
-    void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
+    void populateDebugMessengerCreateInfo(
+        VkDebugUtilsMessengerCreateInfoEXT &createInfo
+    );
 
     void hasGflwRequiredInstanceExtensions();
 
@@ -148,10 +152,14 @@ namespace lve {
     VkQueue graphicsQueue_;
     VkQueue presentQueue_;
 
-    const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
-    const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+    const std::vector<const char *> validationLayers = {
+        "VK_LAYER_KHRONOS_validation"
+    };
+    const std::vector<const char *> deviceExtensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
   };
 
 }// namespace lve
 
-#endif//LVE_LVEDEVICE_HPP
+#endif// LVE_LVEDEVICE_HPP

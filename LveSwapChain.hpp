@@ -60,7 +60,9 @@ namespace lve {
 
     VkResult acquireNextImage(uint32_t *imageIndex);
 
-    VkResult submitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
+    VkResult submitCommandBuffers(
+        const VkCommandBuffer *buffers, uint32_t *imageIndex
+    );
 
   private:
     void createSwapChain();
@@ -111,4 +113,4 @@ namespace lve {
   };
 
 }// namespace lve
-#endif//LVE_LVESWAPCHAIN_HPP
+#endif// LVE_LVESWAPCHAIN_HPP

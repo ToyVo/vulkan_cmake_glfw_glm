@@ -6,6 +6,7 @@
 namespace lve {
 
   FirstApp::FirstApp() {
+    loadModels();
     createPipelineLayout();
     createPipeline();
     createCommandBuffers();
@@ -24,6 +25,13 @@ namespace lve {
     vkDeviceWaitIdle(lveDevice.device());
   }
 
+  void FirstApp::loadModels() {
+    std::vector<LveModel::Vertex> vertices{{{0.0f,  -0.5f}},
+                                           {{0.5f,  0.5f}},
+                                           {{-0.5f, 0.5f}}};
+    lveModel = std::make_unique<LveModel>(lveDevice, vertices);
+  }
+
   void FirstApp::createPipelineLayout() {
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -31,20 +39,20 @@ namespace lve {
     pipelineLayoutInfo.pSetLayouts = nullptr;
     pipelineLayoutInfo.pushConstantRangeCount = 0;
     pipelineLayoutInfo.pPushConstantRanges = nullptr;
-    if (vkCreatePipelineLayout(lveDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout) != VK_SUCCESS) {
+    if (vkCreatePipelineLayout(
+        lveDevice.device(), &pipelineLayoutInfo, nullptr, &pipelineLayout
+    ) != VK_SUCCESS) {
       throw std::runtime_error("failed to create pipeline layout!");
     }
   }
 
   void FirstApp::createPipeline() {
-    auto pipelineConfig = LvePipeline::defaultPipelineConfigInfo(lveSwapChain.width(), lveSwapChain.height());
+    auto pipelineConfig = LvePipeline::defaultPipelineConfigInfo(
+        lveSwapChain.width(), lveSwapChain.height());
     pipelineConfig.renderPass = lveSwapChain.getRenderPass();
     pipelineConfig.pipelineLayout = pipelineLayout;
     lvePipeline = std::make_unique<LvePipeline>(
-        lveDevice,
-        "shaders/simple_shader.vert.spv",
-        "shaders/simple_shader.frag.spv",
-        pipelineConfig
+        lveDevice, "shaders/simple_shader.vert.spv", "shaders/simple_shader.frag.spv", pipelineConfig
     );
   }
 
@@ -57,7 +65,8 @@ namespace lve {
     allocateInfo.commandPool = lveDevice.getCommandPool();
     allocateInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
 
-    if (vkAllocateCommandBuffers(lveDevice.device(), &allocateInfo, commandBuffers.data()) != VK_SUCCESS) {
+    if (vkAllocateCommandBuffers(
+        lveDevice.device(), &allocateInfo, commandBuffers.data()) != VK_SUCCESS) {
       throw std::runtime_error("failed to allocate command buffers!");
     }
 
@@ -83,10 +92,13 @@ namespace lve {
       renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
       renderPassInfo.pClearValues = clearValues.data();
 
-      vkCmdBeginRenderPass(commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
+      vkCmdBeginRenderPass(
+          commandBuffers[i], &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE
+      );
 
       lvePipeline->bind(commandBuffers[i]);
-      vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+      lveModel->bind(commandBuffers[i]);
+      lveModel->draw(commandBuffers[i]);
 
       vkCmdEndRenderPass(commandBuffers[i]);
       if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
@@ -102,7 +114,9 @@ namespace lve {
       throw std::runtime_error("failed to acquire swap chain image");
     }
 
-    result = lveSwapChain.submitCommandBuffers(&commandBuffers[imageIndex], &imageIndex);
+    result = lveSwapChain.submitCommandBuffers(
+        &commandBuffers[imageIndex], &imageIndex
+    );
     if (result != VK_SUCCESS) {
       throw std::runtime_error("failed to present swap chain image");
     }

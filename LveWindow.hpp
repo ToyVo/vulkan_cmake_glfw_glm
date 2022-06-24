@@ -35,4 +35,4 @@ namespace lve {
 
 }// namespace lve
 
-#endif//LVE_LVEWINDOW_HPP
+#endif// LVE_LVEWINDOW_HPP
