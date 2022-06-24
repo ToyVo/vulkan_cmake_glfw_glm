@@ -22,6 +22,7 @@ namespace lve {
         lveDevice, lveRenderer.getSwapChainRenderPass()
     };
     LveCamera camera{};
+    camera.setViewDirection(glm::vec3{0.f}, glm::vec3{.5f, 0.f, 1.f});
 
     while (!lveWindow.shouldClose()) {
       float aspect = lveRenderer.getAspectRatio();
