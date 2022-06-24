@@ -1,5 +1,5 @@
-#ifndef LVE__LVEUTILS_H_
-#define LVE__LVEUTILS_H_
+#ifndef LVE__LVEUTILS_HPP_
+#define LVE__LVEUTILS_HPP_
 
 #include <functional>
 
@@ -11,4 +11,4 @@ namespace lve {
     }
 }// namespace lve
 
-#endif//LVE__LVEUTILS_H_
+#endif//LVE__LVEUTILS_HPP_

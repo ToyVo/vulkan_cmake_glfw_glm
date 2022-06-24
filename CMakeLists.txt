@@ -29,7 +29,7 @@ add_custom_target(shaders ALL DEPENDS ${SPV_SHADERS} make-shader-dir)
 add_custom_target(copy-model-files ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/models ${CMAKE_BINARY_DIR}/models)
 # end copy models
 
-add_executable(lve main.cpp ${SHADERS} LveWindow.cpp LveWindow.hpp FirstApp.cpp FirstApp.hpp LvePipeline.cpp LvePipeline.hpp LveDevice.cpp LveDevice.hpp LveSwapChain.cpp LveSwapChain.hpp LveModel.cpp LveModel.hpp LveGameObject.cpp LveGameObject.hpp LveRenderer.cpp LveRenderer.hpp SimpleRenderSystem.cpp SimpleRenderSystem.hpp LveCamera.cpp LveCamera.hpp KeyboardMovementController.cpp KeyboardMovementController.hpp LveUtils.cpp LveUtils.h)
+add_executable(lve main.cpp ${SHADERS} LveWindow.cpp LveWindow.hpp FirstApp.cpp FirstApp.hpp LvePipeline.cpp LvePipeline.hpp LveDevice.cpp LveDevice.hpp LveSwapChain.cpp LveSwapChain.hpp LveModel.cpp LveModel.hpp LveGameObject.cpp LveGameObject.hpp LveRenderer.cpp LveRenderer.hpp SimpleRenderSystem.cpp SimpleRenderSystem.hpp LveCamera.cpp LveCamera.hpp KeyboardMovementController.cpp KeyboardMovementController.hpp LveUtils.cpp LveUtils.hpp LveBuffer.cpp LveBuffer.hpp LveFrameInfo.cpp LveFrameInfo.hpp)
 add_dependencies(lve shaders copy-model-files)
 target_link_libraries(lve glfw Vulkan::Vulkan)
 target_include_directories(lve PRIVATE libs/tinyobjloader)

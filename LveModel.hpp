@@ -1,6 +1,7 @@
 #ifndef LVE_LVEMODEL_HPP
 #define LVE_LVEMODEL_HPP
 
+#include "LveBuffer.hpp"
 #include "LveDevice.hpp"
 
 #define GLM_FORCE_RADIANS
@@ -51,15 +52,13 @@ namespace lve {
         void createVertexBuffers(const std::vector<Vertex> &vertices);
         void createIndexBuffers(const std::vector<uint32_t> &indices);
 
-        LveDevice &lveDevice;
-        VkBuffer vertexBuffer;
-        VkDeviceMemory vertexBufferMemory;
-        uint32_t vertexCount;
+      LveDevice &lveDevice;
+      std::unique_ptr<LveBuffer> vertexBuffer;
+      uint32_t vertexCount;
 
-        bool hasIndexBuffer = false;
-        VkBuffer indexBuffer;
-        VkDeviceMemory indexBufferMemory;
-        uint32_t indexCount;
+      bool hasIndexBuffer = false;
+      std::unique_ptr<LveBuffer> indexBuffer;
+      uint32_t indexCount;
     };
 }// namespace lve
 
