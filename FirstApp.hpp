@@ -2,7 +2,7 @@
 #define LVE_FIRSTAPP_HPP
 
 #include "LveDevice.hpp"
-#include "LveModel.hpp"
+#include "LveGameObject.hpp"
 #include "LvePipeline.hpp"
 #include "LveSwapChain.hpp"
 #include "LveWindow.hpp"
@@ -27,7 +27,7 @@ namespace lve {
     void run();
 
   private:
-    void loadModels();
+    void loadGameObjects();
 
     void createPipelineLayout();
 
@@ -43,6 +43,8 @@ namespace lve {
 
     void recordCommandBuffer(int imageIndex);
 
+    void renderGameObjects(VkCommandBuffer commandBuffer);
+
     void siserpinski(
         std::vector<LveModel::Vertex> &vertices, int depth, glm::vec2 left, glm::vec2 right, glm::vec2 top
     );
@@ -53,7 +55,7 @@ namespace lve {
     std::unique_ptr<LvePipeline> lvePipeline;
     VkPipelineLayout pipelineLayout;
     std::vector<VkCommandBuffer> commandBuffers;
-    std::unique_ptr<LveModel> lveModel;
+    std::vector<LveGameObject> gameObjects;
   };
 
 }// namespace lve
