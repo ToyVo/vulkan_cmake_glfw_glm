@@ -13,6 +13,8 @@ namespace lve {
 
     PipelineConfigInfo &operator=(const PipelineConfigInfo &) = delete;
 
+    std::vector<VkVertexInputBindingDescription> bindingDescriptions{};
+    std::vector<VkVertexInputAttributeDescription> attributeDescriptions{};
     VkPipelineViewportStateCreateInfo viewportInfo;
     VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
     VkPipelineRasterizationStateCreateInfo rasterizationInfo;
@@ -29,12 +31,8 @@ namespace lve {
 
   class LvePipeline {
   public:
-    LvePipeline(
-        LveDevice &device,
-        const std::string &vertFilePath,
-        const std::string &fragFilePath,
-        const PipelineConfigInfo &configInfo
-    );
+    LvePipeline(LveDevice &device, const std::string &vertFilePath, const std::string &fragFilePath,
+                const PipelineConfigInfo &configInfo);
 
     ~LvePipeline();
 
@@ -49,9 +47,8 @@ namespace lve {
   private:
     static std::vector<char> readFile(const std::string &filePath);
 
-    void createGraphicsPipeline(
-        const std::string &vertFilePath, const std::string &fragFilePath, const PipelineConfigInfo &configInfo
-    );
+    void createGraphicsPipeline(const std::string &vertFilePath, const std::string &fragFilePath,
+                                const PipelineConfigInfo &configInfo);
 
     void createShaderModule(const std::vector<char> &code, VkShaderModule *shaderModule);
 

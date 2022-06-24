@@ -2,7 +2,8 @@
 #include "KeyboardMovementController.hpp"
 #include "LveBuffer.hpp"
 #include "LveCamera.hpp"
-#include "SimpleRenderSystem.hpp"
+#include "systems/LightPointSystem.hpp"
+#include "systems/SimpleRenderSystem.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -15,17 +16,18 @@
 namespace lve {
 
   struct GlobalUbo {
-    glm::mat4 projectionView{1.f};
+    glm::mat4 projection{1.f};
+    glm::mat4 view{1.f};
     glm::vec4 ambientLightColor{1.f, 1.f, 1.f, .02f};
     glm::vec3 lightPosition{-1.f};
     alignas(16) glm::vec4 lightColor{1.f};
   };
 
   FirstApp::FirstApp() {
-    globalPool = LveDescriptorPool::Builder(lveDevice).setMaxSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT).addPoolSize(
-                                                          VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                                          LveSwapChain::MAX_FRAMES_IN_FLIGHT
-                                                      ).build();
+    globalPool = LveDescriptorPool::Builder(lveDevice)
+                     .setMaxSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT)
+                     .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, LveSwapChain::MAX_FRAMES_IN_FLIGHT)
+                     .build();
     loadGameObjects();
   }
 
@@ -35,20 +37,16 @@ namespace lve {
   void FirstApp::run() {
 
     std::vector<std::unique_ptr<LveBuffer>> uboBuffers(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
-    for (auto &uboBuffer: uboBuffers) {
-      uboBuffer = std::make_unique<LveBuffer>(
-          lveDevice,
-          sizeof(GlobalUbo),
-          1,
-          VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-          VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
-      );
+    for (auto &uboBuffer : uboBuffers) {
+      uboBuffer =
+          std::make_unique<LveBuffer>(lveDevice, sizeof(GlobalUbo), 1, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                                      VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
       uboBuffer->map();
     }
 
-    auto globalSetLayout = LveDescriptorSetLayout::Builder(lveDevice).addBinding(
-        0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS
-    ).build();
+    auto globalSetLayout = LveDescriptorSetLayout::Builder(lveDevice)
+                               .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
+                               .build();
 
     std::vector<VkDescriptorSet> globalDescriptorSets(LveSwapChain::MAX_FRAMES_IN_FLIGHT);
     for (int i = 0; i < globalDescriptorSets.size(); i++) {
@@ -56,9 +54,10 @@ namespace lve {
       LveDescriptorWriter(*globalSetLayout, *globalPool).writeBuffer(0, &bufferInfo).build(globalDescriptorSets[i]);
     }
 
-    SimpleRenderSystem simpleRenderSystem{
-        lveDevice, lveRenderer.getSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()
-    };
+    SimpleRenderSystem simpleRenderSystem{lveDevice, lveRenderer.getSwapChainRenderPass(),
+                                          globalSetLayout->getDescriptorSetLayout()};
+    LightPointSystem lightPointSystem{lveDevice, lveRenderer.getSwapChainRenderPass(),
+                                      globalSetLayout->getDescriptorSetLayout()};
     LveCamera camera{};
     camera.setViewTarget(glm::vec3{-1.f, -2.f, -2.f}, glm::vec3{0.f, 0.f, 2.5f});
 
@@ -83,18 +82,19 @@ namespace lve {
 
       if (auto commandBuffer = lveRenderer.beginFrame()) {
         int frameIndex = lveRenderer.getFrameIndex();
-        FrameInfo frameInfo{
-            frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], gameObjects
-        };
+        FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex],
+                            gameObjects};
 
         // update
         GlobalUbo ubo{};
-        ubo.projectionView = camera.getProjection() * camera.getView();
+        ubo.projection = camera.getProjection();
+        ubo.view = camera.getView();
         uboBuffers[frameIndex]->writeToBuffer(&ubo);
 
         // render
         lveRenderer.beginSwapChainRenderPass(commandBuffer);
         simpleRenderSystem.renderGameObjects(frameInfo);
+        lightPointSystem.render(frameInfo);
         lveRenderer.endSwapChainRenderPass(commandBuffer);
         lveRenderer.endFrame();
       }

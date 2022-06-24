@@ -6,12 +6,9 @@
 
 namespace lve {
 
-  LvePipeline::LvePipeline(
-      LveDevice &device,
-      const std::string &vertFilePath,
-      const std::string &fragFilePath,
-      const PipelineConfigInfo &configInfo
-  ) : lveDevice{device} {
+  LvePipeline::LvePipeline(LveDevice &device, const std::string &vertFilePath, const std::string &fragFilePath,
+                           const PipelineConfigInfo &configInfo)
+      : lveDevice{device} {
     createGraphicsPipeline(vertFilePath, fragFilePath, configInfo);
   }
 
@@ -38,9 +35,8 @@ namespace lve {
     return buffer;
   }
 
-  void LvePipeline::createGraphicsPipeline(
-      const std::string &vertFilePath, const std::string &fragFilePath, const PipelineConfigInfo &configInfo
-  ) {
+  void LvePipeline::createGraphicsPipeline(const std::string &vertFilePath, const std::string &fragFilePath,
+                                           const PipelineConfigInfo &configInfo) {
     assert(configInfo.pipelineLayout != VK_NULL_HANDLE &&
            "Cannot create graphics pipeline:: no pipelineLayout provided in "
            "configInfo");
@@ -69,8 +65,8 @@ namespace lve {
     shaderStages[1].pNext = nullptr;
     shaderStages[1].pSpecializationInfo = nullptr;
 
-    auto bindingDescriptions = LveModel::Vertex::getBindingDescriptions();
-    auto attributeDescriptions = LveModel::Vertex::getAttributeDescriptions();
+    auto &bindingDescriptions = configInfo.bindingDescriptions;
+    auto &attributeDescriptions = configInfo.attributeDescriptions;
 
     VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -152,10 +148,8 @@ namespace lve {
     configInfo.multisampleInfo.alphaToCoverageEnable = VK_FALSE;// Optional
     configInfo.multisampleInfo.alphaToOneEnable = VK_FALSE;     // Optional
 
-    configInfo.colorBlendAttachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT |
-                                                     VK_COLOR_COMPONENT_G_BIT |
-                                                     VK_COLOR_COMPONENT_B_BIT |
-                                                     VK_COLOR_COMPONENT_A_BIT;
+    configInfo.colorBlendAttachment.colorWriteMask =
+        VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     configInfo.colorBlendAttachment.blendEnable = VK_FALSE;
     configInfo.colorBlendAttachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE; // Optional
     configInfo.colorBlendAttachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;// Optional
@@ -190,6 +184,9 @@ namespace lve {
     configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
     configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
     configInfo.dynamicStateInfo.flags = 0;
+
+    configInfo.bindingDescriptions = LveModel::Vertex::getBindingDescriptions();
+    configInfo.attributeDescriptions = LveModel::Vertex::getAttributeDescriptions();
   }
 
 }// namespace lve
