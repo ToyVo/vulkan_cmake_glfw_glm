@@ -38,45 +38,72 @@ namespace lve {
   }
 
   void FirstApp::loadGameObjects() {
-    std::vector<LveModel::Vertex> vertices{};
-    siserpinski(vertices, 1, {-0.5f, 0.5f}, {0.5f, 0.5f}, {0.0f, -0.5f});
-    auto lveModel = std::make_shared<LveModel>(lveDevice, vertices);
-
-    std::vector<glm::vec3> colors{{204.f / 255.f, 36.f / 255.f,  29.f / 255.f},
-                                  {184.f / 255.f, 187.f / 255.f, 38.f / 255.f},
-                                  {250.f / 255.f, 189.f / 255.f, 47.f / 255.f},
-                                  {131.f / 255.f, 165.f / 255.f, 152.f / 255.f},
-                                  {211.f / 255.f, 134.f / 255.f, 155.f / 255.f},
-                                  {142.f / 255.f, 192.f / 255.f, 124.f / 255.f},
-                                  {254.f / 255.f, 128.f / 255.f, 25.f / 255.f}};
-
-    float num = colors.size() * colors.size();
-    for (int i = 0; i <= num; i++) {
-      auto triangle = LveGameObject::createGameObject();
-      triangle.model = lveModel;
-      triangle.color = colors[i % colors.size()];
-      triangle.transform2d.scale = glm::vec2(.5f) + i * 1.f / num;
-      triangle.transform2d.rotation = i * glm::pi<float>() * 1.f / num;
-
-      gameObjects.push_back(std::move(triangle));
-    }
+    std::shared_ptr<LveModel> lveModel = createCubeModel(lveDevice, {0.f, 0.f, 0.f});
+    auto cube = LveGameObject::createGameObject();
+    cube.model = lveModel;
+    cube.transform.translation = {0.f, 0.f, 0.f};
+    cube.transform.scale = {0.5f, 0.5f, 0.5f};
+    gameObjects.push_back(std::move(cube));
   }
 
-  void FirstApp::siserpinski(
-      std::vector<LveModel::Vertex> &vertices, int depth, glm::vec2 left, glm::vec2 right, glm::vec2 top
+  std::unique_ptr<LveModel> FirstApp::createCubeModel(
+      LveDevice &device, glm::vec3 offset
   ) {
-    if (depth <= 0) {
-      vertices.push_back({top, {1.0f, 0.0f, 0.0f}});
-      vertices.push_back({right, {0.0f, 1.0f, 0.0f}});
-      vertices.push_back({left, {0.0f, 0.0f, 1.0f}});
-    } else {
-      auto leftTop = 0.5f * (left + top);
-      auto rightTop = 0.5f * (right + top);
-      auto leftRight = 0.5f * (left + right);
-      siserpinski(vertices, depth - 1, left, leftRight, leftTop);
-      siserpinski(vertices, depth - 1, leftRight, right, rightTop);
-      siserpinski(vertices, depth - 1, leftTop, rightTop, top);
+    std::vector<LveModel::Vertex> vertices{
+
+        // left face (white)
+        {{-.5f, -.5f, -.5f},  {.9f, .9f, .9f}},
+        {{-.5f, .5f,  .5f},   {.9f, .9f, .9f}},
+        {{-.5f, -.5f, .5f},   {.9f, .9f, .9f}},
+        {{-.5f, -.5f, -.5f},  {.9f, .9f, .9f}},
+        {{-.5f, .5f,  -.5f},  {.9f, .9f, .9f}},
+        {{-.5f, .5f,  .5f},   {.9f, .9f, .9f}},
+
+        // right face (yellow)
+        {{.5f,  -.5f, -.5f},  {.8f, .8f, .1f}},
+        {{.5f,  .5f,  .5f},   {.8f, .8f, .1f}},
+        {{.5f,  -.5f, .5f},   {.8f, .8f, .1f}},
+        {{.5f,  -.5f, -.5f},  {.8f, .8f, .1f}},
+        {{.5f,  .5f,  -.5f},  {.8f, .8f, .1f}},
+        {{.5f,  .5f,  .5f},   {.8f, .8f, .1f}},
+
+        // top face (orange, remember y axis points down)
+        {{-.5f, -.5f, -.5f},  {.9f, .6f, .1f}},
+        {{.5f,  -.5f, .5f},   {.9f, .6f, .1f}},
+        {{-.5f, -.5f, .5f},   {.9f, .6f, .1f}},
+        {{-.5f, -.5f, -.5f},  {.9f, .6f, .1f}},
+        {{.5f,  -.5f, -.5f},  {.9f, .6f, .1f}},
+        {{.5f,  -.5f, .5f},   {.9f, .6f, .1f}},
+
+        // bottom face (red)
+        {{-.5f, .5f,  -.5f},  {.8f, .1f, .1f}},
+        {{.5f,  .5f,  .5f},   {.8f, .1f, .1f}},
+        {{-.5f, .5f,  .5f},   {.8f, .1f, .1f}},
+        {{-.5f, .5f,  -.5f},  {.8f, .1f, .1f}},
+        {{.5f,  .5f,  -.5f},  {.8f, .1f, .1f}},
+        {{.5f,  .5f,  .5f},   {.8f, .1f, .1f}},
+
+        // nose face (blue)
+        {{-.5f, -.5f, 0.5f},  {.1f, .1f, .8f}},
+        {{.5f,  .5f,  0.5f},  {.1f, .1f, .8f}},
+        {{-.5f, .5f,  0.5f},  {.1f, .1f, .8f}},
+        {{-.5f, -.5f, 0.5f},  {.1f, .1f, .8f}},
+        {{.5f,  -.5f, 0.5f},  {.1f, .1f, .8f}},
+        {{.5f,  .5f,  0.5f},  {.1f, .1f, .8f}},
+
+        // tail face (green)
+        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+        {{.5f,  .5f,  -0.5f}, {.1f, .8f, .1f}},
+        {{-.5f, .5f,  -0.5f}, {.1f, .8f, .1f}},
+        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+        {{.5f,  -.5f, -0.5f}, {.1f, .8f, .1f}},
+        {{.5f,  .5f,  -0.5f}, {.1f, .8f, .1f}},
+
+    };
+    for (auto &v: vertices) {
+      v.position += offset;
     }
+    return std::make_unique<LveModel>(device, vertices);
   }
 
 }// namespace lve

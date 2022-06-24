@@ -5,13 +5,13 @@
 
 namespace lve {
 
-  LveModel::LveModel(LveDevice &device, const std::vector<Vertex> &vertices) : lveDevice(device) {
+  LveModel::LveModel(LveDevice &device, const std::vector<Vertex> &vertices) : lveDevice{device} {
     createVertexBuffers(vertices);
   }
 
   LveModel::~LveModel() {
     vkDestroyBuffer(lveDevice.device(), vertexBuffer, nullptr);
-    vkFreeMemory(lveDevice.device(), vertexMemoryBuffer, nullptr);
+    vkFreeMemory(lveDevice.device(), vertexBufferMemory, nullptr);
   }
 
   void LveModel::createVertexBuffers(const std::vector<Vertex> &vertices) {
@@ -24,13 +24,13 @@ namespace lve {
         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
         vertexBuffer,
-        vertexMemoryBuffer
+        vertexBufferMemory
     );
 
     void *data;
-    vkMapMemory(lveDevice.device(), vertexMemoryBuffer, 0, bufferSize, 0, &data);
+    vkMapMemory(lveDevice.device(), vertexBufferMemory, 0, bufferSize, 0, &data);
     memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-    vkUnmapMemory(lveDevice.device(), vertexMemoryBuffer);
+    vkUnmapMemory(lveDevice.device(), vertexBufferMemory);
   }
 
   void LveModel::draw(VkCommandBuffer commandBuffer) {
@@ -55,7 +55,7 @@ namespace lve {
     std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2);
     attributeDescriptions[0].binding = 0;
     attributeDescriptions[0].location = 0;
-    attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+    attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
     attributeDescriptions[0].offset = offsetof(Vertex, position);
     attributeDescriptions[1].binding = 0;
     attributeDescriptions[1].location = 1;

@@ -2,7 +2,7 @@
 #include <stdexcept>
 
 namespace lve {
-  LveWindow::LveWindow(int w, int h, std::string name) : width(w), height(h), windowName(std::move(name)) {
+  LveWindow::LveWindow(int w, int h, std::string name) : width{w}, height{h}, windowName{std::move(name)} {
     initWindow();
   }
 
@@ -19,22 +19,6 @@ namespace lve {
     window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
     glfwSetWindowUserPointer(window, this);
     glfwSetFramebufferSizeCallback(window, framebufferResizedCallback);
-  }
-
-  bool LveWindow::shouldClose() {
-    return glfwWindowShouldClose(window);
-  }
-
-  VkExtent2D LveWindow::getExtent() {
-    return {static_cast<uint32_t>(width), static_cast<uint32_t>(height)};
-  }
-
-  bool LveWindow::wasWindowResized() {
-    return framebufferResized;
-  }
-
-  void LveWindow::resetWindowResizedFlag() {
-    framebufferResized = false;
   }
 
   void LveWindow::createWindowSurface(

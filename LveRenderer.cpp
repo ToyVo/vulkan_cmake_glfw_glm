@@ -6,7 +6,7 @@
 
 namespace lve {
 
-  LveRenderer::LveRenderer(LveWindow &window, LveDevice &device) : lveWindow(window), lveDevice(device) {
+  LveRenderer::LveRenderer(LveWindow &window, LveDevice &device) : lveWindow{window}, lveDevice{device} {
     recreateSwapChain();
     createCommandBuffers();
   }
